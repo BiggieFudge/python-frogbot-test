@@ -14,28 +14,41 @@ permissions:
   pull-requests: write
   contents: read
   id-token: write
+  # [FIX 1] Required permission to upload SARIF results to GitHub Security tab
+  security-events: write 
 
 jobs:
   frogbot-scan:
     runs-on: self-hosted
     
     steps:
-      - uses: actions/checkout@v4
-        
-      - uses: jfrog/frogbot@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # [FIX 2] Downgrade Python to 3.9 so older packages like lxml==4.6.0 compile successfully
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      - name: Run Frogbot
+        uses: jfrog/frogbot@v2
         env:
-          # [Mandatory] JFrog platform URL
           JF_URL: ${{ secrets.JF_URL }}
-          # [Mandatory] JFrog project key
-          ## JF_PROJECT: ${{ vars.JF_PROJECT }}
-          # [Mandatory] GitHub token (for PR comments and auto-fix PRs)
+          # [FIX 3] Added JF_USER. Since your token is a reference token, pip requires Basic Auth (User + Token).
+          JF_USER: ${{ secrets.JF_USER }} 
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
           JF_GIT_TOKEN: ${{ secrets.JF_GIT_TOKEN }}
-          # [Optional] Single consolidated PR for all dependency fixes (SCA auto-fix)
           JF_GIT_AGGREGATE_FIXES: "TRUE"
           JF_BRANCH_NAME_TEMPLATE: "frogbot-{BRANCH_NAME_HASH}-"
           JF_REQUIREMENTS_FILE: "requirements.txt"
           JFROG_CLI_LOG_LEVEL: DEBUG
           CI: true
-          # [Optional] Uncomment and set if using token auth instead of OIDC
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
           
+      # [FIX 4] Upload the SARIF report to GitHub Advanced Security
+      # - name: Upload Frogbot SARIF to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   # Use 'always()' so the report uploads even if Frogbot finds vulnerabilities and fails the previous step
+      #   if: always() 
+      #   with:
+      #     sarif_file: .frogbot/
