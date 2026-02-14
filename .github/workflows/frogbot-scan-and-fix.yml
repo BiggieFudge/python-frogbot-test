@@ -18,12 +18,10 @@ permissions:
 jobs:
   frogbot-scan:
     runs-on: self-hosted
-    environment: frogbot
+    
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
+        
       - uses: jfrog/frogbot@v2
         env:
           # [Mandatory] JFrog platform URL
