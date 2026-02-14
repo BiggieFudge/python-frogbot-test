@@ -33,5 +33,7 @@ jobs:
           # [Optional] Single consolidated PR for all dependency fixes (SCA auto-fix)
           JF_GIT_AGGREGATE_FIXES: "TRUE"
           JF_BRANCH_NAME_TEMPLATE: "frogbot-{BRANCH_NAME_HASH}-"
+          JF_REQUIREMENTS_FILE: "requirements.txt"
           # [Optional] Uncomment and set if using token auth instead of OIDC
           JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          
