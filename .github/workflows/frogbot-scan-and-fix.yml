@@ -28,6 +28,9 @@ jobs:
       # [FIX 2] Downgrade Python to 3.9 so older packages like lxml==4.6.0 compile successfully
       - name: Setup Python 3.9
         uses: actions/setup-python@v5
+        env:
+          # מפנה את הכלים לתיקייה שה-Runner כבר מורשה לכתוב אליה
+          RUNNER_TOOL_CACHE: /Users/eytanr/Desktop/actions-runner/_work/_tool
         with:
           python-version: '3.9'
       
