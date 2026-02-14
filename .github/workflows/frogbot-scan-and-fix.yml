@@ -1,0 +1,39 @@
+# FrogBot CI/CD Engine for FrogBot-Py-Showcase
+# Scans for: SCA (deps), SAST, Secrets, IaC, Contextual Analysis
+# With JF_GIT_AGGREGATE_FIXES: "TRUE", FrogBot creates a single consolidated PR for dependency fixes.
+# Docs: https://github.com/jfrog/frogbot
+
+name: "Frogbot Scan Pull Request"
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+  push:
+    branches: [main, master]
+
+permissions:
+  pull-requests: write
+  contents: read
+  id-token: write
+
+jobs:
+  frogbot-scan:
+    runs-on: self-hosted
+    environment: frogbot
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: jfrog/frogbot@v2
+        env:
+          # [Mandatory] JFrog platform URL
+          JF_URL: ${{ secrets.JF_URL }}
+          # [Mandatory] JFrog project key
+          ## JF_PROJECT: ${{ vars.JF_PROJECT }}
+          # [Mandatory] GitHub token (for PR comments and auto-fix PRs)
+          JF_GIT_TOKEN: ${{ secrets.JF_GIT_TOKEN }}
+          # [Optional] Single consolidated PR for all dependency fixes (SCA auto-fix)
+          JF_GIT_AGGREGATE_FIXES: "TRUE"
+          JF_BRANCH_NAME_TEMPLATE: "frogbot-{BRANCH_NAME_HASH}-"
+          # [Optional] Uncomment and set if using token auth instead of OIDC
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
