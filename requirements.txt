@@ -1,4 +1,4 @@
-flask==0.12.2      # Very old, has multiple known vulnerabilities
+flask==2.2.5      # Very old, has multiple known vulnerabilities
 requests==2.27.1   # Outdated, vulnerable
-lxml==4.6.0        # Vulnerable to CVE-2021-43818
-PyJWT==1.7.0       # Has known algorithmic confusion vulnerabilities
+lxml==4.9.1        # Vulnerable to CVE-2021-43818
+pyjwt==2.4.0       # Has known algorithmic confusion vulnerabilities
